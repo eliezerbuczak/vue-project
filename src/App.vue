@@ -1,76 +1,74 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <header>
-    <h1 class="text-4xl font-bold">FUNCIONOU</h1>
-  </header>
+  <div class="w-full flex h-screen items-center justify-center relative">
+    <div class="wrapper bg-orange-600 h-auto w-96">
+      <header class="cursor-move" @mousedown="startDrag(1)" @mouseup="stopDrag(1)">Draggable Div 1</header>
+      <div class="content">
+        <div class="icon"></div>
+        <div class="title">Draggable Div 1</div>
+        <p>This is a draggable div which is created using HTML CSS & JavaScript. You can move this div anywhere on the document or page.</p>
+      </div>
+    </div>
 
-  <RouterView />
+    <div class="wrapper bg-blue-600 h-auto w-96" >
+      <header class="cursor-move" @mousedown="startDrag(2 )" @mouseup="stopDrag(2)">Draggable Div 2</header>
+      <div class="content">
+        <div class="icon"></div>
+        <div class="title">Draggable Div 2</div>
+        <p>This is another draggable div. You can move this one too!</p>
+      </div>
+    </div>
+    <div class="wrapper bg-green-400 h-auto w-96">
+      <header class="cursor-move" @mousedown="startDrag(3 )" @mouseup="stopDrag(3)">Draggable Div 2</header>
+      <div class="content">
+        <div class="icon"></div>
+        <div class="title">Draggable Div 2</div>
+        <p>This is another draggable div. You can move this one too!</p>
+      </div>
+    </div>
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
+<script setup>
+import { ref, onMounted } from "vue";
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
+let isDragging = false;
+let activeWrapper = null;
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+const startDrag = (wrapperId) => {
+  if (!isDragging) {
+    isDragging = true;
+    activeWrapper = wrapperId;
+    document.querySelector(`.wrapper${wrapperId}`).classList.add("active");
+    document.addEventListener("mousemove", onDrag);
   }
+};
 
-  .logo {
-    margin: 0 2rem 0 0;
+const stopDrag = (wrapperId) => {
+  if (activeWrapper === wrapperId) {
+    isDragging = false;
+    activeWrapper = null;
+    document.querySelector(`.wrapper${wrapperId}`).classList.remove("active");
+    document.removeEventListener("mousemove", onDrag);
   }
+};
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
+const onDrag = (event) => {
+  if (isDragging) {
+    const movementX = event.movementX;
+    const movementY = event.movementY;
+    let element = document.querySelector(`.wrapper${activeWrapper}`);
+    let getStyle = window.getComputedStyle(element);
+    let leftVal = parseInt(getStyle.left);
+    let topVal = parseInt(getStyle.top);
+    element.style.left = `${leftVal + movementX}px`;
+    element.style.top = `${topVal + movementY}px`;
   }
+};
 
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-</style>
+onMounted(() => {
+  document.querySelectorAll(".wrapper").forEach((element, index) => {
+    element.style.position = "absolute";
+    element.classList.add(`wrapper${index + 1}`);
+  });
+});
+</script>
